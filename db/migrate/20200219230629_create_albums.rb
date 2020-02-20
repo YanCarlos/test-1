@@ -1,7 +1,7 @@
 class CreateAlbums < ActiveRecord::Migration[5.2]
   def change
     create_table :albums do |t|
-      t.references :artist, foreign_key: true, index: true
+      t.references :artist, foreign_key: true, index: true, on_delete: :cascade
       t.string :name
       t.string :image
       t.integer :total_tracks
