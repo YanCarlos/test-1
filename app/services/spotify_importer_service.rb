@@ -26,15 +26,15 @@ class SpotifyImporterService
         }
 
         return true
-      rescue StandardError => e
-        @error = e.full_message
-
-        return false
+      rescue RestClient::TooManyRequests => e
+        puts "too many request, retrying..."
+        sleep_service(e.response)
+        retry
       end
-    rescue RestClient::TooManyRequests => e
-      puts "too many request, retrying..."
-      sleep_service(e.response)
-      retry
+    rescue StandardError => e
+      @error = e.message
+
+      return false
     end
   end
 
