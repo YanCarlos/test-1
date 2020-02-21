@@ -99,6 +99,7 @@ class SpotifyImporterService
 
   def sleep_service(response)
     sleep_time = if response.headers[:retry_after].present?
+      puts "retry_after: #{response.headers[:retry_after]}"
       (response.headers[:retry_after]).to_i.seconds + 2
     else
       2
