@@ -16,7 +16,6 @@ class SpotifyImporterService
   def import
     begin
       @artist = find_artist(@artist_name)
-      
       return unless @artist
 
       @albums_and_songs = find_albums_and_songs(@artist)
@@ -30,6 +29,15 @@ class SpotifyImporterService
       @error = e.message
 
       return false
+    rescue RestClient::TooManyRequests => e
+      sleep_time = if e.response.headers[:retry_after].present?
+                     (e.response.headers[:retry_after]).to_i.seconds + 0.5
+                   else
+                     0.5
+                   end
+      puts "The importer is sleeping, wait..."
+      sleep(sleep_time)
+      retry
     end
   end
 
