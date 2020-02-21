@@ -26,7 +26,7 @@ class SpotifyImporterService
 
       return true
     rescue StandardError => e
-      @error = e.message
+      @error = e.backtrace
 
       return false
     rescue RestClient::TooManyRequests => e
