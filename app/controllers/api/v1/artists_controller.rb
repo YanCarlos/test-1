@@ -1,8 +1,16 @@
 module Api
   module V1
-    class ArtistsController < ApplicationController
+    class ArtistsController < BaseController
+      before_action :set_artists, only: :index
+
       def index
-        render json: Artist.ordered_by_popularity, status: :ok 
+        json_response(@artists, @artists.count, :ok)
+      end
+
+      private
+
+      def set_artists
+        @artists = Artist.ordered_by_popularity
       end
     end
   end

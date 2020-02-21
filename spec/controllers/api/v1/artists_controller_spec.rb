@@ -14,14 +14,18 @@ describe Api::V1::ArtistsController, 'GET#index' do
     expect(response.status).to eq(200)
   end
 
+  it 'returns artists count on X-Total-Count' do
+    expect(response['X-Total-Count']).to eq(8)
+  end
+
   it 'retrieves all artists (8)' do
-    artists_count = JSON.parse(response.body).count
+    artists_count = JSON.parse(response.body)['data'].count
 
     expect(artists_count).to eq(8)
   end
 
   context 'validating expected attributes for artists' do
-    let!(:artist) { JSON.parse(response.body).first }
+    let!(:artist) { JSON.parse(response.body)['data'].first }
 
     it 'returns id of the artist' do
       expect(artist.key?('id')).to be(true)
