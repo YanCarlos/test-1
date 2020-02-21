@@ -15,27 +15,25 @@ class SpotifyImporterService
 
   def import
     begin
-      @artist = find_artist(@artist_name)
-      return unless @artist
+      begin
+        @artist = find_artist(@artist_name)
+        return unless @artist
 
-      @albums_and_songs = find_albums_and_songs(@artist)
-      @artist = {
-        artist: build_artist(@artist),
-        albums_and_songs: @albums_and_songs
-      }
+        @albums_and_songs = find_albums_and_songs(@artist)
+        @artist = {
+          artist: build_artist(@artist),
+          albums_and_songs: @albums_and_songs
+        }
 
-      return true
+        return true
+      rescue StandardError => e
+        @error = e.full_message
 
+        return false
+      end
     rescue RestClient::TooManyRequests => e
-      @error = e.full_message
-      puts "entro al TooManyRequests"
-      sleep_time = if e.response.headers[:retry_after].present?
-                     (e.response.headers[:retry_after]).to_i.seconds + 0.5
-                   else
-                     0.5
-                   end
-      puts "The importer is sleeping, wait..."
-      sleep(sleep_time)
+      puts "too many request, retrying..."
+      sleep_service(e.response)
       retry
     end
   end
@@ -97,5 +95,14 @@ class SpotifyImporterService
       spotify_id: song.id,
       spotify_url: song.uri
     }
+  end
+
+  def sleep_service(response)
+    sleep_time = if response.headers[:retry_after].present?
+      (response.headers[:retry_after]).to_i.seconds + 1
+    else
+      1
+    end
+    sleep(sleep_time)
   end
 end
