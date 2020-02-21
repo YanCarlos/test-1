@@ -25,11 +25,10 @@ class SpotifyImporterService
       }
 
       return true
-    rescue StandardError => e
-      @error = e.full_message
 
-      return false
     rescue RestClient::TooManyRequests => e
+      @error = e.full_message
+      puts "entro al TooManyRequests"
       sleep_time = if e.response.headers[:retry_after].present?
                      (e.response.headers[:retry_after]).to_i.seconds + 0.5
                    else
